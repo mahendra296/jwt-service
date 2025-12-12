@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Create roles table -->
+    <changeSet id="12122025014400-01-create-roles-table" author="jwt-service">
+        <createTable tableName="roles">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Create users table -->
+    <changeSet id="12122025014400-02-create-users-table" author="jwt-service">
+        <createTable tableName="users">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="VARCHAR(50)"/>
+            <column name="last_name" type="VARCHAR(50)"/>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="created_at" type="DATETIME"/>
+            <column name="updated_at" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Create user_roles join table -->
+    <changeSet id="12122025014400-03-create-user-roles-table" author="jwt-service">
+        <createTable tableName="user_roles">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="user_roles"
+                       columnNames="user_id, role_id"
+                       constraintName="pk_user_roles"/>
+
+        <addForeignKeyConstraint baseTableName="user_roles"
+                                 baseColumnNames="user_id"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_user_roles_user"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="user_roles"
+                                 baseColumnNames="role_id"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="id"
+                                 constraintName="fk_user_roles_role"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- Create api_logs table -->
+    <changeSet id="12122025014400-04-create-api-logs-table" author="jwt-service">
+        <createTable tableName="api_logs">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="endpoint" type="VARCHAR(255)"/>
+            <column name="http_method" type="VARCHAR(10)"/>
+            <column name="request_body" type="TEXT"/>
+            <column name="response_body" type="TEXT"/>
+            <column name="status_code" type="INT"/>
+            <column name="username" type="VARCHAR(50)"/>
+            <column name="ip_address" type="VARCHAR(45)"/>
+            <column name="execution_time_ms" type="BIGINT"/>
+            <column name="timestamp" type="DATETIME"/>
+            <column name="error_message" type="TEXT"/>
+        </createTable>
+
+        <createIndex tableName="api_logs" indexName="idx_api_logs_timestamp">
+            <column name="timestamp"/>
+        </createIndex>
+
+        <createIndex tableName="api_logs" indexName="idx_api_logs_username">
+            <column name="username"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

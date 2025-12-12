@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="create-user-activity-table" author="system">
+        <createTable tableName="user_activity">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="BIGINT"/>
+            <column name="active_timestamp" type="TIMESTAMP"/>
+            <column name="timezone" type="VARCHAR(100)"/>
+            <column name="channel" type="VARCHAR(50)"/>
+            <column name="ip_address" type="VARCHAR(50)"/>
+            <column name="device" type="VARCHAR(255)"/>
+            <column name="operating_system" type="VARCHAR(100)"/>
+            <column name="browser" type="VARCHAR(100)"/>
+            <column name="activity" type="VARCHAR(255)"/>
+            <column name="method_name" type="VARCHAR(255)"/>
+            <column name="other_fields" type="TEXT"/>
+            <column name="trace_id" type="VARCHAR(100)"/>
+            <column name="phone_number" type="VARCHAR(50)"/>
+            <column name="customer_number" type="VARCHAR(100)"/>
+            <column name="username" type="VARCHAR(255)"/>
+            <column name="request_url" type="VARCHAR(500)"/>
+            <column name="request" type="TEXT"/>
+            <column name="response" type="TEXT"/>
+        </createTable>
+
+        <createIndex tableName="user_activity" indexName="idx_user_activity_customer_id">
+            <column name="customer_id"/>
+        </createIndex>
+
+        <createIndex tableName="user_activity" indexName="idx_user_activity_username">
+            <column name="username"/>
+        </createIndex>
+
+        <createIndex tableName="user_activity" indexName="idx_user_activity_activity">
+            <column name="activity"/>
+        </createIndex>
+
+        <createIndex tableName="user_activity" indexName="idx_user_activity_timestamp">
+            <column name="active_timestamp"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

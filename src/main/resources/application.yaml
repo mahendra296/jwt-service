@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: jwt-service
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:jwtdb}?createDatabaseIfNotExist=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:none}
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        transaction:
+          jta:
+            platform: org.hibernate.service.jta.platform.internal.NoJtaPlatform
+  liquibase:
+    change-log: classpath:/db/master.xml
+    enabled: true
+
+jwt:
+  secret: ${JWT_SECRET:TestSecretKeyThatIsAtLeast32Bytes}
+  expiration: ${JWT_EXPIRATION:3600000}
+
+security:
+  public-endpoints: /auth/**,/api/auth/**,/register,/login

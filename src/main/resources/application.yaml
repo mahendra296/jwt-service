@@ -24,5 +24,9 @@ jwt:
   secret: ${JWT_SECRET:TestSecretKeyThatIsAtLeast32Bytes}
   expiration: ${JWT_EXPIRATION:3600000}
 
+app:
+  audit:
+    enabled: true
+
 security:
   public-endpoints: /auth/**,/api/auth/**,/register,/login

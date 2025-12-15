@@ -4,15 +4,14 @@ import com.jwt.model.Role;
 import com.jwt.model.User;
 import com.jwt.repository.RoleRepository;
 import com.jwt.repository.UserRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -86,8 +85,8 @@ public class UserService {
     public User updateUser(Long id, User userDetails) {
         log.info("Updating user with id: {}", id);
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        User user =
+                userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
         // Update email if changed and not duplicate
         if (userDetails.getEmail() != null && !userDetails.getEmail().equals(user.getEmail())) {
@@ -131,14 +130,16 @@ public class UserService {
     public User assignRoles(Long userId, Set<String> roleNames) {
         log.info("Assigning roles to user id: {}", userId);
 
-        User user = userRepository.findById(userId)
+        User user = userRepository
+                .findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         Set<Role> roles = user.getRoles();
         roles.clear();
 
         roleNames.forEach(roleName -> {
-            Role role = roleRepository.findByName(roleName)
+            Role role = roleRepository
+                    .findByName(roleName)
                     .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
             roles.add(role);
         });
@@ -155,7 +156,8 @@ public class UserService {
     public User activateUser(Long userId) {
         log.info("Activating user with id: {}", userId);
 
-        User user = userRepository.findById(userId)
+        User user = userRepository
+                .findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         user.setActive(true);
 
@@ -171,7 +173,8 @@ public class UserService {
     public User deactivateUser(Long userId) {
         log.info("Deactivating user with id: {}", userId);
 
-        User user = userRepository.findById(userId)
+        User user = userRepository
+                .findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         user.setActive(false);
 
@@ -187,7 +190,8 @@ public class UserService {
     public void changePassword(Long userId, String oldPassword, String newPassword) {
         log.info("Changing password for user id: {}", userId);
 
-        User user = userRepository.findById(userId)
+        User user = userRepository
+                .findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {

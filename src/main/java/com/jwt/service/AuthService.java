@@ -8,6 +8,9 @@ import com.jwt.model.User;
 import com.jwt.repository.RoleRepository;
 import com.jwt.repository.UserRepository;
 import com.jwt.utils.JwtUtil;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,10 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,18 +57,18 @@ public class AuthService {
         Set<Role> roles = new HashSet<>();
         if (request.getRoles() != null && !request.getRoles().isEmpty()) {
             request.getRoles().forEach(roleName -> {
-                Role role = roleRepository.findByName(roleName)
+                Role role = roleRepository
+                        .findByName(roleName)
                         .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
                 roles.add(role);
             });
         } else {
             // Default role: USER
-            Role userRole = roleRepository.findByName("ROLE_USER")
-                    .orElseGet(() -> {
-                        Role newRole = new Role("ROLE_USER");
-                        newRole.setDescription("Standard user role");
-                        return roleRepository.save(newRole);
-                    });
+            Role userRole = roleRepository.findByName("ROLE_USER").orElseGet(() -> {
+                Role newRole = new Role("ROLE_USER");
+                newRole.setDescription("Standard user role");
+                return roleRepository.save(newRole);
+            });
             roles.add(userRole);
         }
         user.setRoles(roles);
@@ -77,9 +76,7 @@ public class AuthService {
         // Save user
         userRepository.save(user);
 
-        Set<String> roleNames = user.getRoles().stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet());
+        Set<String> roleNames = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
 
         log.info("User registered successfully: {}", user.getUsername());
         return new AuthResponse("", user.getUsername(), user.getEmail(), roleNames);
@@ -90,22 +87,17 @@ public class AuthService {
 
         // Authenticate user
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         // Load user details
-        User user = userRepository.findByUsername(request.getUsername())
+        User user = userRepository
+                .findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Generate token
         String token = jwtUtil.generateToken(user);
 
-        Set<String> roleNames = user.getRoles().stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet());
+        Set<String> roleNames = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
 
         log.info("User logged in successfully: {}", user.getUsername());
         return new AuthResponse(token, user.getUsername(), user.getEmail(), roleNames);

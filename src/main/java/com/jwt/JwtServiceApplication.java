@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class JwtServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(JwtServiceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(JwtServiceApplication.class, args);
+    }
 }

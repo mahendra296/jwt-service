@@ -2,13 +2,12 @@ package com.jwt.service;
 
 import com.jwt.model.Role;
 import com.jwt.repository.RoleRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -67,8 +66,8 @@ public class RoleService {
     public Role updateRole(Long id, Role roleDetails) {
         log.info("Updating role with id: {}", id);
 
-        Role role = roleRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Role not found with id: " + id));
+        Role role =
+                roleRepository.findById(id).orElseThrow(() -> new RuntimeException("Role not found with id: " + id));
 
         if (roleDetails.getDescription() != null) {
             role.setDescription(roleDetails.getDescription());

@@ -2,11 +2,10 @@ package com.jwt.model;
 
 import com.jwt.dto.AuditLog;
 import jakarta.persistence.*;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.ZonedDateTime;
 
 @Entity
 @Data

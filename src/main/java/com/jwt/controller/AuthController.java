@@ -28,8 +28,7 @@ public class AuthController {
             index = 0,
             shouldStoreAll = false,
             fieldsToAudit = {"username", "email", "firstName", "lastName"},
-            activity = "USER_REGISTRATION"
-    )
+            activity = "USER_REGISTRATION")
     public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request) {
         log.info("Registration request received for username: {}", request.getUsername());
         try {
@@ -39,8 +38,7 @@ public class AuthController {
                     .body(ApiResponse.success("User registered successfully", response));
         } catch (Exception e) {
             log.error("Registration failed for username: {} - Error: {}", request.getUsername(), e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.error(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(e.getMessage()));
         }
     }
 
@@ -49,8 +47,7 @@ public class AuthController {
             index = 0,
             shouldStoreAll = false,
             fieldsToAudit = {"username"},
-            activity = "USER_LOGIN"
-    )
+            activity = "USER_LOGIN")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         log.info("Login attempt for username: {}", request.getUsername());
         try {
@@ -69,8 +66,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> getProfile(Authentication authentication) {
         String username = authentication.getName();
         log.info("Profile viewed by user: {}", username);
-        return ResponseEntity.ok(ApiResponse.success("Profile retrieved",
-                "Welcome, " + username + "!"));
+        return ResponseEntity.ok(ApiResponse.success("Profile retrieved", "Welcome, " + username + "!"));
     }
 
     @GetMapping("/admin")
@@ -78,8 +74,7 @@ public class AuthController {
     @Audited(activity = "ADMIN_DASHBOARD_ACCESS")
     public ResponseEntity<ApiResponse<String>> adminEndpoint() {
         log.info("Admin dashboard accessed");
-        return ResponseEntity.ok(ApiResponse.success("Admin access granted",
-                "This is an admin-only endpoint"));
+        return ResponseEntity.ok(ApiResponse.success("Admin access granted", "This is an admin-only endpoint"));
     }
 
     @GetMapping("/user")
@@ -87,7 +82,6 @@ public class AuthController {
     @Audited(activity = "USER_DASHBOARD_ACCESS")
     public ResponseEntity<ApiResponse<String>> userEndpoint() {
         log.info("User dashboard accessed");
-        return ResponseEntity.ok(ApiResponse.success("User access granted",
-                "This is a user endpoint"));
+        return ResponseEntity.ok(ApiResponse.success("User access granted", "This is a user endpoint"));
     }
 }

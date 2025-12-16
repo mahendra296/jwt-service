@@ -24,6 +24,9 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private Long expiration;
 
+    @Value("${jwt.refresh-expiration}")
+    private Long refreshExpiration;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -73,5 +76,9 @@ public class JwtUtil {
         String base64Encoded = Base64.getEncoder().encodeToString(secret.getBytes(StandardCharsets.UTF_8));
         byte[] keyBytes = Decoders.BASE64.decode(base64Encoded);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public Long getRefreshExpiration() {
+        return refreshExpiration;
     }
 }

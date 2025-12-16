@@ -23,6 +23,7 @@ spring:
 jwt:
   secret: ${JWT_SECRET:TestSecretKeyThatIsAtLeast32Bytes}
   expiration: ${JWT_EXPIRATION:3600000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
 
 app:
   audit:

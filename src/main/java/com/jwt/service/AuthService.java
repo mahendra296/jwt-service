@@ -2,7 +2,9 @@ package com.jwt.service;
 
 import com.jwt.dto.AuthResponse;
 import com.jwt.dto.LoginRequest;
+import com.jwt.dto.RefreshTokenRequest;
 import com.jwt.dto.RegisterRequest;
+import com.jwt.model.RefreshToken;
 import com.jwt.model.Role;
 import com.jwt.model.User;
 import com.jwt.repository.RoleRepository;
@@ -29,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -79,9 +82,10 @@ public class AuthService {
         Set<String> roleNames = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
 
         log.info("User registered successfully: {}", user.getUsername());
-        return new AuthResponse("", user.getUsername(), user.getEmail(), roleNames);
+        return new AuthResponse(null, null, user.getUsername(), user.getEmail(), roleNames);
     }
 
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         log.info("User attempting to login: {}", request.getUsername());
 
@@ -94,12 +98,47 @@ public class AuthService {
                 .findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Generate token
+        // Generate access token
         String token = jwtUtil.generateToken(user);
+
+        // Generate refresh token
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
         Set<String> roleNames = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
 
         log.info("User logged in successfully: {}", user.getUsername());
-        return new AuthResponse(token, user.getUsername(), user.getEmail(), roleNames);
+        return new AuthResponse(token, refreshToken.getToken(), user.getUsername(), user.getEmail(), roleNames);
+    }
+
+    @Transactional
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+        log.info("Refresh token request received");
+
+        return refreshTokenService
+                .findByToken(request.getRefreshToken())
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    // Generate new access token
+                    String accessToken = jwtUtil.generateToken(user);
+
+                    // Generate new refresh token (rotate refresh tokens for security)
+                    RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user);
+
+                    Set<String> roleNames =
+                            user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
+
+                    log.info("Token refreshed successfully for user: {}", user.getUsername());
+                    return new AuthResponse(
+                            accessToken, newRefreshToken.getToken(), user.getUsername(), user.getEmail(), roleNames);
+                })
+                .orElseThrow(() -> new RuntimeException("Refresh token not found or invalid"));
+    }
+
+    @Transactional
+    public void logout(String refreshToken) {
+        log.info("Logout request received");
+        refreshTokenService.revokeToken(refreshToken);
+        log.info("User logged out successfully");
     }
 }

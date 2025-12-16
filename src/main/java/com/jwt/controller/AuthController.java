@@ -4,6 +4,7 @@ import com.jwt.annotation.Audited;
 import com.jwt.dto.ApiResponse;
 import com.jwt.dto.AuthResponse;
 import com.jwt.dto.LoginRequest;
+import com.jwt.dto.RefreshTokenRequest;
 import com.jwt.dto.RegisterRequest;
 import com.jwt.service.AuthService;
 import jakarta.validation.Valid;
@@ -83,5 +84,40 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> userEndpoint() {
         log.info("User dashboard accessed");
         return ResponseEntity.ok(ApiResponse.success("User access granted", "This is a user endpoint"));
+    }
+
+    @PostMapping("/refresh")
+    @Audited(
+            index = 0,
+            shouldStoreAll = false,
+            fieldsToAudit = {},
+            activity = "TOKEN_REFRESH")
+    public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(
+            @Valid @RequestBody RefreshTokenRequest request) {
+        log.info("Token refresh request received");
+        try {
+            AuthResponse response = authService.refreshToken(request);
+            log.info("Token refreshed successfully");
+            return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully", response));
+        } catch (Exception e) {
+            log.warn("Token refresh failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/logout")
+    @Audited(activity = "USER_LOGOUT")
+    public ResponseEntity<ApiResponse<String>> logout(@Valid @RequestBody RefreshTokenRequest request) {
+        log.info("Logout request received");
+        try {
+            authService.logout(request.getRefreshToken());
+            log.info("User logged out successfully");
+            return ResponseEntity.ok(ApiResponse.success("Logged out successfully", null));
+        } catch (Exception e) {
+            log.warn("Logout failed: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error(e.getMessage()));
+        }
     }
 }

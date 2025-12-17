@@ -92,8 +92,7 @@ public class AuthController {
             shouldStoreAll = false,
             fieldsToAudit = {},
             activity = "TOKEN_REFRESH")
-    public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(
-            @Valid @RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
         log.info("Token refresh request received");
         try {
             AuthResponse response = authService.refreshToken(request);
@@ -101,8 +100,7 @@ public class AuthController {
             return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully", response));
         } catch (Exception e) {
             log.warn("Token refresh failed: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponse.error(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error(e.getMessage()));
         }
     }
 
@@ -116,8 +114,7 @@ public class AuthController {
             return ResponseEntity.ok(ApiResponse.success("Logged out successfully", null));
         } catch (Exception e) {
             log.warn("Logout failed: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.error(e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(e.getMessage()));
         }
     }
 }

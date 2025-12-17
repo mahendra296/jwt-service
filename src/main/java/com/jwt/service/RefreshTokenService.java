@@ -47,7 +47,9 @@ public class RefreshTokenService {
         }
 
         if (token.isRevoked()) {
-            log.warn("Attempted to use revoked refresh token for user: {}", token.getUser().getUsername());
+            log.warn(
+                    "Attempted to use revoked refresh token for user: {}",
+                    token.getUser().getUsername());
             throw new RuntimeException("Refresh token was revoked. Please make a new login request");
         }
 
@@ -59,7 +61,8 @@ public class RefreshTokenService {
         refreshTokenRepository.findByToken(token).ifPresent(refreshToken -> {
             refreshToken.setRevoked(true);
             refreshTokenRepository.save(refreshToken);
-            log.info("Revoked refresh token for user: {}", refreshToken.getUser().getUsername());
+            log.info(
+                    "Revoked refresh token for user: {}", refreshToken.getUser().getUsername());
         });
     }
 

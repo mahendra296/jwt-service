@@ -366,7 +366,8 @@ public class ApiLoggingAspect {
 
             // Mask sensitive fields
             if (requestBody.contains("password")) {
-                requestBody = requestBody.replaceAll("\"password\"\\s*:\\s*\"[^\"]*\"", "\"password\":\"***MASKED***\"");
+                requestBody =
+                        requestBody.replaceAll("\"password\"\\s*:\\s*\"[^\"]*\"", "\"password\":\"***MASKED***\"");
             }
             if (requestBody.contains("email")) {
                 requestBody = requestBody.replaceAll("\"email\"\\s*:\\s*\"[^\"]*\"", "\"email\":\"***MASKED***\"");
